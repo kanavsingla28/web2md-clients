@@ -1,0 +1,51 @@
+[project]
+name = "web2md-client"
+version = "0.1.0"
+description = "Python client for the Web2MD API: web pages to clean Markdown and heading-aware RAG chunks, with LangChain and LlamaIndex loaders."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Kanav Singla" }]
+keywords = ["markdown", "rag", "langchain", "llamaindex", "web-scraping", "chunking", "llm"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Text Processing :: Markup :: Markdown",
+  "Typing :: Typed",
+]
+dependencies = ["httpx>=0.27"]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.3"]
+llamaindex = ["llama-index-core>=0.12"]
+
+[project.urls]
+Homepage = "https://rapidapi.com/kanavsingla28/api/web2md-webpage-to-markdown-rag-chunks"
+Source = "https://github.com/kanavsingla28/web2md-clients"
+
+[dependency-groups]
+dev = [
+  "pytest>=8", "pytest-asyncio>=0.24", "respx>=0.22", "ruff>=0.8",
+  "langchain-core>=0.3", "llama-index-core>=0.12",
+]
+examples = ["langchain-community>=0.3", "fastembed>=0.4"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/web2md_client"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["live: calls the real API; needs RAPIDAPI_KEY"]
+addopts = "-m 'not live'"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
