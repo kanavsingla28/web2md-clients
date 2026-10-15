@@ -39,6 +39,7 @@ packages = ["src/web2md_client"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 asyncio_mode = "auto"
 markers = ["live: calls the real API; needs RAPIDAPI_KEY"]
 addopts = "-m 'not live'"
