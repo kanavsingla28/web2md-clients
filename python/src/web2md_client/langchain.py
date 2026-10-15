@@ -16,7 +16,14 @@ except ImportError as exc:  # pragma: no cover - exercised via test_optional_imp
 
 from web2md_client._client import AsyncWeb2MD, Web2MD
 from web2md_client._errors import Web2MDError
-from web2md_client._records import Mode, aiter_records, check_mode, iter_records, normalize_urls
+from web2md_client._records import (
+    Mode,
+    aiter_records,
+    check_mode,
+    extraction_flags,
+    iter_records,
+    normalize_urls,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +42,16 @@ class Web2MDLoader(BaseLoader):
         client: Any = None,
         async_client: Any = None,
         continue_on_failure: bool = False,
+        include_links: bool | None = None,
+        include_images: bool | None = None,
+        include_tables: bool | None = None,
     ) -> None:
         self.urls = normalize_urls(urls)
         self.mode = check_mode(mode)
         self.max_tokens = max_tokens
         self.overlap_tokens = overlap_tokens
         self.continue_on_failure = continue_on_failure
+        self._flags = extraction_flags(include_links, include_images, include_tables)
         self._api_key = api_key
         self._client = client
         self._async_client = async_client
@@ -56,7 +67,7 @@ class Web2MDLoader(BaseLoader):
             for url in self.urls:
                 try:
                     records = iter_records(
-                        client, url, self.mode, self.max_tokens, self.overlap_tokens
+                        client, url, self.mode, self.max_tokens, self.overlap_tokens, self._flags
                     )
                 except Web2MDError as exc:
                     self._failed(url, exc)
@@ -73,7 +84,7 @@ class Web2MDLoader(BaseLoader):
             for url in self.urls:
                 try:
                     records = await aiter_records(
-                        client, url, self.mode, self.max_tokens, self.overlap_tokens
+                        client, url, self.mode, self.max_tokens, self.overlap_tokens, self._flags
                     )
                 except Web2MDError as exc:
                     self._failed(url, exc)

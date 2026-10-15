@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
 
 class Web2MDError(Exception):
@@ -11,6 +12,9 @@ class Web2MDError(Exception):
         self.code = code
         self.message = message
         self.status = status
+
+    def __reduce__(self) -> tuple[Any, tuple[str, str, int | None]]:
+        return (type(self), (self.code, self.message, self.status))
 
 
 def _gateway_code(status: int) -> str:

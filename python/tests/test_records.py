@@ -7,9 +7,11 @@ from web2md_client._records import check_mode, iter_records, normalize_urls
 class FakeClient:
     def __init__(self):
         self.calls = []
+        self.flags = []
 
-    def chunks(self, url, *, max_tokens, overlap_tokens):
+    def chunks(self, url, *, max_tokens, overlap_tokens, **flags):
         self.calls.append(("chunks", url, max_tokens, overlap_tokens))
+        self.flags.append(flags)
         return ChunksResult.from_dict(
             {
                 "url": url + "final",
@@ -23,8 +25,9 @@ class FakeClient:
             }
         )
 
-    def read(self, url, *, format):
+    def read(self, url, *, format, **flags):
         self.calls.append(("read", url, format))
+        self.flags.append(flags)
         return Document.from_dict(
             {
                 "url": url,
@@ -73,7 +76,7 @@ def test_read_record_drops_none():
 
 def test_title_none_dropped_from_chunks():
     class NoTitle(FakeClient):
-        def chunks(self, url, *, max_tokens, overlap_tokens):
+        def chunks(self, url, *, max_tokens, overlap_tokens, **flags):
             return ChunksResult.from_dict(
                 {
                     "chunks": [{"id": 0, "heading_path": [], "text": "x", "tokens": 1}],

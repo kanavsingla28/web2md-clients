@@ -18,6 +18,17 @@ def normalize_urls(urls: str | Sequence[str]) -> list[str]:
     return [urls] if isinstance(urls, str) else list(urls)
 
 
+def extraction_flags(
+    include_links: bool | None, include_images: bool | None, include_tables: bool | None
+) -> dict[str, bool]:
+    given = {
+        "include_links": include_links,
+        "include_images": include_images,
+        "include_tables": include_tables,
+    }
+    return {k: v for k, v in given.items() if v is not None}
+
+
 def _clean(meta: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in meta.items() if v is not None}
 
@@ -53,20 +64,36 @@ def read_record(doc: Any, url: str) -> Record:
 
 
 def iter_records(
-    client: Any, url: str, mode: Mode, max_tokens: int, overlap_tokens: int
+    client: Any,
+    url: str,
+    mode: Mode,
+    max_tokens: int,
+    overlap_tokens: int,
+    flags: dict[str, bool] | None = None,
 ) -> list[Record]:
     if mode == "chunks":
         return chunk_records(
-            client.chunks(url, max_tokens=max_tokens, overlap_tokens=overlap_tokens), url
+            client.chunks(
+                url, max_tokens=max_tokens, overlap_tokens=overlap_tokens, **(flags or {})
+            ),
+            url,
         )
-    return [read_record(client.read(url, format="markdown"), url)]
+    return [read_record(client.read(url, format="markdown", **(flags or {})), url)]
 
 
 async def aiter_records(
-    client: Any, url: str, mode: Mode, max_tokens: int, overlap_tokens: int
+    client: Any,
+    url: str,
+    mode: Mode,
+    max_tokens: int,
+    overlap_tokens: int,
+    flags: dict[str, bool] | None = None,
 ) -> list[Record]:
     if mode == "chunks":
         return chunk_records(
-            await client.chunks(url, max_tokens=max_tokens, overlap_tokens=overlap_tokens), url
+            await client.chunks(
+                url, max_tokens=max_tokens, overlap_tokens=overlap_tokens, **(flags or {})
+            ),
+            url,
         )
-    return [read_record(await client.read(url, format="markdown"), url)]
+    return [read_record(await client.read(url, format="markdown", **(flags or {})), url)]

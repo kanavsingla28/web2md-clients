@@ -58,3 +58,13 @@ async def test_alazy_load_uses_async_client():
 
     docs = [d async for d in Web2MDLoader("https://a/", async_client=AsyncFake()).alazy_load()]
     assert [d.page_content for d in docs] == ["intro", "body"]
+
+
+@pytest.mark.parametrize("mode", ["chunks", "read"])
+def test_loader_forwards_only_set_flags(mode):
+    fake = FakeClient()
+    Web2MDLoader("https://a/", mode=mode, client=fake, include_links=False).load()
+    assert fake.flags == [{"include_links": False}]
+    fake = FakeClient()
+    Web2MDLoader("https://a/", mode=mode, client=fake).load()
+    assert fake.flags == [{}]

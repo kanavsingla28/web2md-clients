@@ -177,3 +177,16 @@ def test_custom_base_url_sets_host_header():
     with Web2MD(api_key="k", base_url="https://api.example.dev/") as c:
         c.read("https://e.com/")
     assert route.calls.last.request.headers["X-RapidAPI-Host"] == "api.example.dev"
+
+
+def test_error_is_picklable():
+    import pickle
+
+    from web2md_client import Web2MDError
+
+    for e in (
+        Web2MDError("target_blocked", "Bot wall.", 502),
+        Web2MDError("timeout", "slow", None),
+    ):
+        r = pickle.loads(pickle.dumps(e))
+        assert (r.code, r.message, r.status, str(r)) == (e.code, e.message, e.status, str(e))
