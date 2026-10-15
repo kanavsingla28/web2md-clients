@@ -18,12 +18,7 @@ def test_core_import_does_not_pull_frameworks():
     "module,blocked,extra",
     [
         ("web2md_client.langchain", "langchain_core", "langchain"),
-        pytest.param(
-            "web2md_client.llamaindex",
-            "llama_index",
-            "llamaindex",
-            marks=pytest.mark.xfail(strict=True, reason="Task 4"),
-        ),
+        ("web2md_client.llamaindex", "llama_index", "llamaindex"),
     ],
 )
 def test_missing_extra_gives_install_hint(monkeypatch, module, blocked, extra):
