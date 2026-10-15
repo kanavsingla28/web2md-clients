@@ -1,0 +1,36 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  leaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check-leaks.sh
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: { python: ["3.10", "3.12", "3.13"] }
+    defaults: { run: { working-directory: python } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: { python-version: "${{ matrix.python }}" }
+      - run: uv sync --group dev
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run pytest -q
+      - run: uv build
+  js:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: js } }
+    strategy:
+      matrix: { node: ["20", "22", "24"] }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "${{ matrix.node }}" }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
