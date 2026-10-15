@@ -10,6 +10,7 @@ describe.skipIf(!live)("live API", () => {
     const doc = await w.read({ url: URL });
     expect(doc.word_count).toBeGreaterThan(200);
     const { chunks } = await w.chunks({ url: URL, max_tokens: 256, overlap_tokens: 0 });
+    expect(chunks.length).toBeGreaterThan(0);
     expect(chunks.every((c) => c.tokens <= 256)).toBe(true);
   }, 60_000);
 });

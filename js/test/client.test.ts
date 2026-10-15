@@ -69,6 +69,29 @@ describe("Web2MD", () => {
       .rejects.toMatchObject({ code: "timeout" });
   });
 
+  it("maps a body stream failure to network_error", async () => {
+    const f = vi.fn(async () => new Response(
+      new ReadableStream({ start(c) { c.error(new TypeError("terminated")); } }), { status: 200 }));
+    await expect(new Web2MD({ apiKey: "k", fetch: f }).read({ url: "u" }))
+      .rejects.toMatchObject({ name: "Web2MDError", code: "network_error", status: null });
+  });
+
+  it("maps a body read timeout to timeout", async () => {
+    const f = vi.fn(async () => new Response(
+      new ReadableStream({ start(c) { c.error(new DOMException("aborted", "AbortError")); } }), { status: 200 }));
+    await expect(new Web2MD({ apiKey: "k", fetch: f }).read({ url: "u" }))
+      .rejects.toMatchObject({ code: "timeout" });
+  });
+
+  it("includes the cause code and keeps the cause", async () => {
+    const cause = { code: "ECONNREFUSED" };
+    const f = vi.fn(async () => { throw Object.assign(new TypeError("fetch failed"), { cause }); });
+    const err = await new Web2MD({ apiKey: "k", fetch: f }).read({ url: "u" }).catch((e) => e);
+    expect(err.message).toContain("ECONNREFUSED");
+    expect(err.message).toBe("fetch failed (ECONNREFUSED)");
+    expect(err.cause).toBeInstanceOf(TypeError);
+  });
+
   it("rejects a non-JSON success body", async () => {
     const c = new Web2MD({ apiKey: "k", fetch: mockFetch(200, "oops", true) });
     await expect(c.read({ url: "u" })).rejects.toMatchObject({ code: "invalid_response" });

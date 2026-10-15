@@ -2,8 +2,8 @@ export class Web2MDError extends Error {
   readonly code: string;
   readonly status: number | null;
 
-  constructor(code: string, message: string, status: number | null) {
-    super(message);
+  constructor(code: string, message: string, status: number | null, options?: { cause?: unknown }) {
+    super(message, options);
     this.name = "Web2MDError";
     this.code = code;
     this.status = status;

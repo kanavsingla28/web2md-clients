@@ -50,8 +50,19 @@ export class Web2MD {
   chunks(params: ChunksParams): Promise<ChunksResult> { return this.#post("/v1/chunks", params); }
   metadata(params: MetadataParams): Promise<MetadataResult> { return this.#post("/v1/metadata", params); }
 
+  #transportError(e: unknown): Web2MDError {
+    const name = (e as { name?: string })?.name;
+    if (name === "TimeoutError" || name === "AbortError") {
+      return new Web2MDError("timeout", `Request timed out after ${this.#timeoutMs} ms.`, null, { cause: e });
+    }
+    const code = (e as { cause?: { code?: unknown } })?.cause?.code;
+    const msg = (e as Error)?.message ?? String(e);
+    return new Web2MDError("network_error", typeof code === "string" ? `${msg} (${code})` : msg, null, { cause: e });
+  }
+
   async #post<T>(path: string, body: object): Promise<T> {
     let res: Response;
+    let text: string;
     try {
       res = await this.#fetch(this.#base + path, {
         method: "POST",
@@ -63,14 +74,10 @@ export class Web2MD {
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(this.#timeoutMs),
       });
+      text = await res.text();
     } catch (e) {
-      const name = (e as { name?: string })?.name;
-      if (name === "TimeoutError" || name === "AbortError") {
-        throw new Web2MDError("timeout", `Request timed out after ${this.#timeoutMs} ms.`, null);
-      }
-      throw new Web2MDError("network_error", (e as Error)?.message ?? String(e), null);
+      throw this.#transportError(e);
     }
-    const text = await res.text();
     let data: unknown;
     try { data = text ? JSON.parse(text) : undefined; } catch { data = undefined; }
     if (!res.ok) throw errorFromResponse(res.status, data, text);
