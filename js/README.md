@@ -8,7 +8,7 @@ Turn any web page into clean Markdown and heading-aware RAG chunks with the [Web
 npm install web2md-client
 ```
 
-Works in Node 18+ and any runtime with `fetch`. ESM and CommonJS builds are included.
+Works in Node 20+ and any runtime with `fetch`. ESM and CommonJS builds are included.
 
 ## Quickstart
 

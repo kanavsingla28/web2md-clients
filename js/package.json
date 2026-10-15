@@ -22,10 +22,11 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "sideEffects": false,
   "keywords": [
@@ -40,6 +41,9 @@
     "type": "git",
     "url": "git+https://github.com/kanavsingla28/web2md-clients.git",
     "directory": "js"
+  },
+  "bugs": {
+    "url": "https://github.com/kanavsingla28/web2md-clients/issues"
   },
   "homepage": "https://rapidapi.com/kanavsingla28/api/web2md-webpage-to-markdown-rag-chunks",
   "publishConfig": {
