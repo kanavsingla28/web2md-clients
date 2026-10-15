@@ -37,3 +37,9 @@ def test_readme_example_runs(capsys):
     pytest.importorskip("fastembed")
     runpy.run_path(str(Path(__file__).parents[2] / "examples" / "rag_in_10_lines.py"))
     assert "[" in capsys.readouterr().out
+
+
+def test_llamaindex_example_runs(capsys):
+    pytest.importorskip("llama_index.embeddings.fastembed")
+    runpy.run_path(str(Path(__file__).parents[2] / "examples" / "llamaindex_retriever.py"))
+    assert capsys.readouterr().out.strip()

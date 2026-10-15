@@ -1337,6 +1337,18 @@ wheels = [
 ]
 
 [[package]]
+name = "llama-index-embeddings-fastembed"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llama-index-core" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9d/80/a7bcd8cb0d9d41466103b6dbf114a13ab77b411c44b5536ae3f0ccac550c/llama_index_embeddings_fastembed-0.7.0.tar.gz", hash = "sha256:11ebb16c64f4d2f57c12f9c72292e08818cd342e48d32edaa010a4ab469e891f", size = 4117, upload-time = "2026-08-29T15:35:18.168Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1d/fa/ca77873380cd0b06289077b1a400c70cc7efa82407434a772312d0bef385/llama_index_embeddings_fastembed-0.7.0-py3-none-any.whl", hash = "sha256:74db8146a84a42721fb5a1a17626dccc25db5b169f5073b5f73310bea4a7a151", size = 3760, upload-time = "2026-08-29T15:35:17.288Z" },
+]
+
+[[package]]
 name = "llama-index-instrumentation"
 version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3792,6 +3804,7 @@ dev = [
 examples = [
     { name = "fastembed" },
     { name = "langchain-community" },
+    { name = "llama-index-embeddings-fastembed" },
 ]
 
 [package.metadata]
@@ -3814,6 +3827,7 @@ dev = [
 examples = [
     { name = "fastembed", specifier = ">=0.4" },
     { name = "langchain-community", specifier = ">=0.3" },
+    { name = "llama-index-embeddings-fastembed" },
 ]
 
 [[package]]

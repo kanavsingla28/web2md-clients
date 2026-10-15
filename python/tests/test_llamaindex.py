@@ -31,3 +31,25 @@ def test_reader_failure_modes():
     with pytest.raises(Web2MDError, match="https://a/"):
         Web2MDReader(client=Failing()).load_data(["https://a/"])
     assert Web2MDReader(client=Failing(), continue_on_failure=True).load_data(["https://a/"]) == []
+
+
+@pytest.mark.parametrize("mode", ["chunks", "read"])
+def test_reader_forwards_only_set_flags(mode):
+    fake = FakeClient()
+    Web2MDReader(mode=mode, client=fake, include_tables=True, include_images=False).load_data(
+        "https://a/"
+    )
+    assert fake.flags == [{"include_tables": True, "include_images": False}]
+    fake = FakeClient()
+    Web2MDReader(mode=mode, client=fake).load_data("https://a/")
+    assert fake.flags == [{}]
+
+
+def test_chunk_embed_metadata_excludes_ids():
+    from llama_index.core.schema import MetadataMode
+
+    doc = Web2MDReader(client=FakeClient()).load_data("https://a/")[1]
+    embed = doc.get_content(metadata_mode=MetadataMode.EMBED)
+    assert "A > B" in embed and "chunk_id" not in embed and "source" not in embed
+    llm = doc.get_content(metadata_mode=MetadataMode.LLM)
+    assert "source" in llm and "chunk_id" not in llm and "tokens" not in llm

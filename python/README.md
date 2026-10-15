@@ -63,14 +63,32 @@ for hit in store.similarity_search("What problem does RAG solve?", k=3):
 
 ## LlamaIndex
 
+No LLM key needed: this uses a local FastEmbed embedding and a retriever (no query engine).
+
 ```py
-from llama_index.core import VectorStoreIndex
+# pip install "web2md-client[llamaindex]" llama-index-embeddings-fastembed
+from llama_index.core import Settings, VectorStoreIndex
+from llama_index.embeddings.fastembed import FastEmbedEmbedding
 from web2md_client.llamaindex import Web2MDReader
 
-docs = Web2MDReader(mode="chunks", max_tokens=400).load_data(["https://example.com"])
+Settings.embed_model = FastEmbedEmbedding(model_name="BAAI/bge-small-en-v1.5")
+docs = Web2MDReader(max_tokens=400).load_data(["https://en.wikipedia.org/wiki/Retrieval-augmented_generation"])
 index = VectorStoreIndex.from_documents(docs)
-print(index.as_query_engine().query("What is this page about?"))
+for hit in index.as_retriever(similarity_top_k=3).retrieve("What problem does RAG solve?"):
+    print(hit.node.metadata.get("heading_path"), hit.node.get_content()[:200])
 ```
+
+`VectorStoreIndex.from_documents` may re-split our chunks with its default `SentenceSplitter`; that is harmless.
+
+## Loader options
+
+Both loaders accept keyword-only `include_links`, `include_images` and `include_tables` (each `True`, `False` or `None`). They are forwarded to the API only when set; `None` leaves the API default. `include_links=False` gives cleaner embeddings.
+
+```py
+Web2MDLoader(urls, include_links=False, include_tables=True)
+```
+
+A missing API key is reported when loading starts, not when the loader is constructed.
 
 ## Loader metadata
 
@@ -88,7 +106,7 @@ In `read` mode the keys are `source`, `title`, `tokens`, `word_count`, `author`,
 
 ## Errors
 
-Every failure raises `Web2MDError` with `.code`, `.message` and `.status` (HTTP status, or `None` for client-side failures).
+API, gateway and network failures raise `Web2MDError`; invalid arguments, such as passing both `url` and `html`, raise `ValueError`. `Web2MDError` has `.code`, `.message` and `.status` (HTTP status, or `None` for client-side failures).
 
 ```py
 from web2md_client import Web2MD, Web2MDError
@@ -101,9 +119,9 @@ except Web2MDError as e:
 
 | Code | Status | Meaning |
 | --- | --- | --- |
-| `invalid_url` | 4xx | The URL is malformed or not http(s) |
-| `blocked_destination` | 4xx | The URL points to a disallowed destination |
-| `dns_error` | 4xx | The host could not be resolved |
+| `invalid_url` | 400 | The URL is malformed or not http(s) |
+| `blocked_destination` | 400 | The URL points to a disallowed destination |
+| `dns_error` | 400 | The host could not be resolved |
 | `robots_disallowed` | 403 | The site's robots.txt forbids fetching |
 | `page_too_large` | 413 | The page exceeds the size limit |
 | `unsupported_content_type` | 415 | The URL is not an HTML page |

@@ -21,3 +21,8 @@ def test_readme_rag_example_matches_examples_file():
 def test_versions_agree():
     assert _client._VERSION == web2md_client.__version__
     assert f'version = "{web2md_client.__version__}"' in (ROOT / "pyproject.toml").read_text()
+
+
+def test_readme_llamaindex_example_matches_examples_file():
+    example = (ROOT / "examples" / "llamaindex_retriever.py").read_text()
+    assert example in re.findall(r"```py\n(.*?)```", (ROOT / "README.md").read_text(), flags=re.S)

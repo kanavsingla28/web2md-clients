@@ -7,7 +7,7 @@ Official Python and TypeScript clients for the [Web2MD API](https://rapidapi.com
 | [`python/`](python/) | PyPI `web2md-client` (import `web2md_client`) | [python/README.md](python/README.md) |
 | [`js/`](js/) | npm `web2md-client` | [js/README.md](js/README.md) |
 
-Both include LangChain and LlamaIndex integrations (Python) and typed responses. Get an API key from the [RapidAPI listing](https://rapidapi.com/kanavsingla28/api/web2md-webpage-to-markdown-rag-chunks).
+Both include typed responses. The LangChain and LlamaIndex integrations are Python-only (there are none in the TypeScript package). Get an API key from the [RapidAPI listing](https://rapidapi.com/kanavsingla28/api/web2md-webpage-to-markdown-rag-chunks).
 
 ## Development
 
